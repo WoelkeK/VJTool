@@ -104,7 +104,7 @@ public class MainViewController implements Initializable {
         String protocol = interfaceType.getSelectionModel().getSelectedItem().getProtocolType();
         if (CRCheckBox.isSelected()) rawData.append("\r");
         if (LFCheckBox.isSelected()) rawData.append("\n");
-        LOGGER.info("Protokol: " + protocol);
+        LOGGER.info("Protokoł: " + protocol);
         switch (protocol) {
             case "wsi":
                 rawData.append("wsi");
