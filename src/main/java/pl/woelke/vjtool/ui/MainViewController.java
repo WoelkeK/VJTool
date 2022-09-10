@@ -29,8 +29,6 @@ public class MainViewController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(MainViewController.class.getName());
     private SerialPort port = null;
     WillettPacked willettPacked = new WillettPacked();
-    private Character statusCommand = 'H';
-    private String dataCommand = "";
 
     @FXML
     private ComboBox<PrinterType> printerName;
@@ -131,10 +129,10 @@ public class MainViewController implements Initializable {
         LOGGER.info("Protokoł: " + protocol);
         switch (protocol) {
             case "WSI":
-            case  "ESI":
+            case "ESI":
             case "ZIPHER21":
 //                rawData.append("Wersja protokołu: " + protocol +"\n");
-                rawData.append(willettPacked.sendMessgae(statusCommand, dataCommand));
+                rawData.append(willettPacked.getPrinterStatus());
                 port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
                 break;
 //            case "esi":
@@ -150,13 +148,7 @@ public class MainViewController implements Initializable {
                 port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
                 break;
         }
-        if (echoCheckBox.isSelected())
-            switch(statusCommand) {
-                case 'H':statusConsole.appendText("\nStatus drukarki: ");
-                break;
-                default: statusConsole.appendText("\n Nierozpoznana komenda ");
-                break;
-            }
+        if (echoCheckBox.isSelected()) statusConsole.appendText("\nStatus drukarki: ");
     }
 
 
