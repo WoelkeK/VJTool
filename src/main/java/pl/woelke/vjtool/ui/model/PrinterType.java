@@ -1,7 +1,6 @@
 package pl.woelke.vjtool.ui.model;
 
 public enum PrinterType {
-    VJ12X0("1210"),
     VJ15X0("1510"),
     VJ16X0("1610"),
     VJ1580("1580"),

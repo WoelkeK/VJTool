@@ -18,6 +18,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.paint.Color;
 import pl.woelke.vjtool.ui.model.PrinterType;
 import pl.woelke.vjtool.ui.model.ProtocolType;
+import pl.woelke.vjtool.ui.model.WillettPacked;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -27,6 +28,9 @@ public class MainViewController implements Initializable {
 
     private static final Logger LOGGER = Logger.getLogger(MainViewController.class.getName());
     private SerialPort port = null;
+    WillettPacked willettPacked = new WillettPacked();
+    private Character statusCommand = 'H';
+    private String dataCommand = "";
 
     @FXML
     private ComboBox<PrinterType> printerName;
@@ -99,31 +103,60 @@ public class MainViewController implements Initializable {
 
     @FXML
     public void checkStatus() {
+        statusConsole.clear();
         if (echoCheckBox.isSelected()) statusConsole.appendText("\n" + dataTextField.getText() + "\n");
         StringBuilder rawData = new StringBuilder();
         String protocol = interfaceType.getSelectionModel().getSelectedItem().getProtocolType();
+        String printerType = printerName.getSelectionModel().getSelectedItem().getPrinterType();
         if (CRCheckBox.isSelected()) rawData.append("\r");
         if (LFCheckBox.isSelected()) rawData.append("\n");
+        switch (printerType) {
+            case "1510":
+            case "1610":
+            case "1880":
+//                rawData.append("Model Drukarki: " + printerType +"\n");
+//                rawData.append(willettPacked.sendMessgae('H',""));
+//                rawData.append("\u0002");
+//                rawData.append('H');
+//                rawData.append("\u0003");
+//                port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
+
+
+                break;
+            default:
+                rawData.append("Nieprawidłowy typ drukarki! ");
+                port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
+                break;
+        }
         LOGGER.info("Protokoł: " + protocol);
         switch (protocol) {
-            case "wsi":
-                rawData.append("wsi");
+            case "WSI":
+            case  "ESI":
+            case "ZIPHER21":
+//                rawData.append("Wersja protokołu: " + protocol +"\n");
+                rawData.append(willettPacked.sendMessgae(statusCommand, dataCommand));
                 port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
                 break;
-            case "esi":
-                rawData.append("esi");
-                port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
-                break;
-            case "zipher":
-                rawData.append("zipher");
-                port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
-                break;
+//            case "esi":
+//                rawData.append("esi");
+//                port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
+//                break;
+//            case "zipher":
+//                rawData.append("zipher");
+//                port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
+//                break;
             default:
                 rawData.append("Nieprawidłowy typu protokołu! ");
                 port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
                 break;
         }
-        if (echoCheckBox.isSelected()) statusConsole.appendText("\n" + rawData + "\n");
+        if (echoCheckBox.isSelected())
+            switch(statusCommand) {
+                case 'H':statusConsole.appendText("\nStatus drukarki: ");
+                break;
+                default: statusConsole.appendText("\n Nierozpoznana komenda ");
+                break;
+            }
     }
 
 

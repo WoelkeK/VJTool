@@ -1,9 +1,9 @@
 package pl.woelke.vjtool.ui.model;
 
 public enum ProtocolType {
-    WSI("wsi"),
-    ESI("esi"),
-    ZIPHER("zipher");
+    WSI("WSI"),
+    ESI("ESI"),
+    ZIPHER("ZIPHER");
 
     final String protocolType;
 
