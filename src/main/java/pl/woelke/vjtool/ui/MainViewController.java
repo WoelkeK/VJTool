@@ -140,7 +140,7 @@ public class MainViewController implements Initializable {
             case "ESI":
                 rawData.append(willettPacked.sendMessgae(statusCommand, dataCommand));
                 port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
-                printerTypeImage.setImage(new Image("VJ1560.png"));
+                printerTypeImage.setImage(new Image("Excel2000.jpg"));
                 break;
             case "ZIPHER":
                 rawData.append(willettPacked.sendMessgae(statusCommand, dataCommand));
