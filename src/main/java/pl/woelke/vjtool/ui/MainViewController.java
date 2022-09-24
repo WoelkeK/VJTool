@@ -15,6 +15,8 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import pl.woelke.vjtool.ui.model.PrinterType;
 import pl.woelke.vjtool.ui.model.ProtocolType;
@@ -29,6 +31,8 @@ public class MainViewController implements Initializable {
     private static final Logger LOGGER = Logger.getLogger(MainViewController.class.getName());
     private SerialPort port = null;
     WillettPacked willettPacked = new WillettPacked();
+    private Character statusCommand = 'H';
+    private String dataCommand = "";
 
     @FXML
     private ComboBox<PrinterType> printerName;
@@ -76,6 +80,8 @@ public class MainViewController implements Initializable {
     Label connectedLabel;
     @FXML
     Button statusBtn;
+    @FXML
+    ImageView printerTypeImage;
 
     @FXML
     protected void onCloseButtonClick() {
@@ -118,8 +124,6 @@ public class MainViewController implements Initializable {
 //                rawData.append('H');
 //                rawData.append("\u0003");
 //                port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
-
-
                 break;
             default:
                 rawData.append("Nieprawidłowy typ drukarki! ");
@@ -129,11 +133,19 @@ public class MainViewController implements Initializable {
         LOGGER.info("Protokoł: " + protocol);
         switch (protocol) {
             case "WSI":
-            case "ESI":
-            case "ZIPHER21":
-//                rawData.append("Wersja protokołu: " + protocol +"\n");
-                rawData.append(willettPacked.getPrinterStatus());
+                rawData.append(willettPacked.sendMessgae(statusCommand, dataCommand));
                 port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
+                printerTypeImage.setImage(new Image("s1000.png"));
+                break;
+            case "ESI":
+                rawData.append(willettPacked.sendMessgae(statusCommand, dataCommand));
+                port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
+                printerTypeImage.setImage(new Image("VJ1560.png"));
+                break;
+            case "ZIPHER":
+                rawData.append(willettPacked.sendMessgae(statusCommand, dataCommand));
+                port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
+                printerTypeImage.setImage(new Image("VJ1880.jpg"));
                 break;
 //            case "esi":
 //                rawData.append("esi");
@@ -148,11 +160,17 @@ public class MainViewController implements Initializable {
                 port.writeBytes(rawData.toString().getBytes(), rawData.toString().length());
                 break;
         }
-        if (echoCheckBox.isSelected()) statusConsole.appendText("\nStatus drukarki: ");
+        if (echoCheckBox.isSelected())
+            switch (statusCommand) {
+                case 'H':
+                    statusConsole.appendText("\nStatus drukarki: ");
+                    break;
+                default:
+                    statusConsole.appendText("\n Nierozpoznana komenda ");
+                    break;
+            }
     }
 
-
-    //set the baud rate of selected port.
     public void setBaudRate() {
         if (port != null) {
             int baudRate = (baudRateComboBox.getSelectionModel().getSelectedItem());
@@ -169,15 +187,8 @@ public class MainViewController implements Initializable {
     }
 
     public void InitPrinterSetupView() {
-
-
         printerName.getItems().setAll(PrinterType.values());
         interfaceType.getItems().setAll(ProtocolType.values());
-
-//        setSerialPort.getItems().setAll((communicator.detectPort()));
-//        ObservableList<String> printerPorts = FXCollections.observableArrayList();
-//        printerPorts.addAll(communicator.detectPort());
-//        setSerialPort.setItems(printerPorts);
     }
 
     public void selectBaudRate() {
@@ -286,7 +297,7 @@ public class MainViewController implements Initializable {
             connectBtn.setDisable(false);
             portsComboBox.getSelectionModel().select(0);
         } else
-            receiveConsole.appendText("\nNo żaden port szeregowy nie jest dospępny");
+            receiveConsole.appendText("\nNo żaden port szeregowy nie jest dostępny");
     }
 
     public void disconnectPort() {
