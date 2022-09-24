@@ -32,5 +32,4 @@ public class CommApp extends Application {
             System.exit(0);
         });
     }
-
 }
